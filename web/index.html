@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Monitor - Мониторинг загрузки логов</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Log Monitor</span>
+                </div>
+                <nav class="nav">
+                    <a href="#dashboard" class="nav-link active">Dashboard</a>
+                    <a href="#upload" class="nav-link">Загрузка</a>
+                    <a href="#elk" class="nav-link">ELK Config</a>
+                    <a href="#settings" class="nav-link">Настройки</a>
+                </nav>
+                <div class="header-actions">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="user-menu">
+                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h1>Мониторинг загрузки логов</h1>
+                    <p>Отслеживание файлов логов в реальном времени с автоматической отправкой в ELK Stack</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalFiles">0</div>
+                            <div class="stat-label">Всего файлов</div>
+                        </div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+12%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="uploadedToday">0</div>
+                            <div class="stat-label">Загружено сегодня</div>
+                        </div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8%</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="elkStatus">Активен</div>
+                            <div class="stat-label">Статус ELK</div>
+                        </div>
+                        <div class="stat-trend success">
+                            <i class="fas fa-check"></i>
+                            <span>Online</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="avgProcessTime">2.3s</div>
+                            <div class="stat-label">Среднее время обработки</div>
+                        </div>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>-5%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Monitor -->
+                <div class="monitor-section">
+                    <div class="monitor-header">
+                        <h2>Мониторинг в реальном времени</h2>
+                        <div class="monitor-controls">
+                            <button class="btn btn-primary" id="startMonitoring">
+                                <i class="fas fa-play"></i>
+                                Запустить мониторинг
+                            </button>
+                            <button class="btn btn-secondary" id="pauseMonitoring" style="display: none;">
+                                <i class="fas fa-pause"></i>
+                                Приостановить
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="monitor-content">
+                        <div class="monitor-panel">
+                            <div class="panel-header">
+                                <h3>Активные файлы</h3>
+                                <span class="status-indicator active"></span>
+                            </div>
+                            <div class="file-list" id="activeFiles">
+                                <!-- Files will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <div class="monitor-panel">
+                            <div class="panel-header">
+                                <h3>Логи активности</h3>
+                                <button class="btn btn-sm btn-secondary" id="clearLogs">Очистить</button>
+                            </div>
+                            <div class="activity-log" id="activityLog">
+                                <!-- Activity logs will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section id="upload" class="section">
+                <div class="section-header">
+                    <h1>Загрузка файлов логов</h1>
+                    <p>Добавление новых файлов для мониторинга</p>
+                </div>
+
+                <div class="upload-area">
+                    <div class="upload-zone" id="uploadZone">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Перетащите файлы сюда или нажмите для выбора</h3>
+                        <p>Поддерживаются форматы: .log, .txt, .json</p>
+                        <input type="file" id="fileInput" multiple accept=".log,.txt,.json" hidden>
+                    </div>
+                </div>
+
+                <div class="upload-settings">
+                    <h3>Настройки загрузки</h3>
+                    <div class="settings-grid">
+                        <div class="setting-item">
+                            <label>Директория для мониторинга</label>
+                            <input type="text" class="form-input" placeholder="/path/to/logs" id="monitorPath">
+                        </div>
+                        <div class="setting-item">
+                            <label>Шаблон файлов</label>
+                            <input type="text" class="form-input" placeholder="*.log" id="filePattern">
+                        </div>
+                        <div class="setting-item">
+                            <label>Автообновление (сек)</label>
+                            <input type="number" class="form-input" value="5" id="refreshInterval">
+                        </div>
+                        <div class="setting-item">
+                            <label>Максимальный размер файла (MB)</label>
+                            <input type="number" class="form-input" value="100" id="maxFileSize">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ELK Configuration Section -->
+            <section id="elk" class="section">
+                <div class="section-header">
+                    <h1>Конфигурация ELK Stack</h1>
+                    <p>Настройка подключения к Elasticsearch, Logstash и Kibana</p>
+                </div>
+
+                <div class="elk-config">
+                    <div class="config-tabs">
+                        <button class="tab-button active" data-tab="elasticsearch">Elasticsearch</button>
+                        <button class="tab-button" data-tab="logstash">Logstash</button>
+                        <button class="tab-button" data-tab="kibana">Kibana</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="elasticsearch" class="tab-panel active">
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>URL Elasticsearch</label>
+                                    <input type="text" class="form-input" placeholder="http://localhost:9200" id="elasticUrl">
+                                </div>
+                                <div class="form-group">
+                                    <label>Индекс</label>
+                                    <input type="text" class="form-input" placeholder="logs-*" id="elasticIndex">
+                                </div>
+                                <div class="form-group">
+                                    <label>Имя пользователя</label>
+                                    <input type="text" class="form-input" placeholder="elastic" id="elasticUser">
+                                </div>
+                                <div class="form-group">
+                                    <label>Пароль</label>
+                                    <input type="password" class="form-input" id="elasticPassword">
+                                </div>
+                                <button class="btn btn-primary" id="testElasticConnection">
+                                    <i class="fas fa-plug"></i>
+                                    Проверить соединение
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="logstash" class="tab-panel">
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>URL Logstash</label>
+                                    <input type="text" class="form-input" placeholder="http://localhost:5044" id="logstashUrl">
+                                </div>
+                                <div class="form-group">
+                                    <label>Тип входа</label>
+                                    <select class="form-select" id="logstashInput">
+                                        <option value="beats">Beats</option>
+                                        <option value="http">HTTP</option>
+                                        <option value="tcp">TCP</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Формат данных</label>
+                                    <select class="form-select" id="logstashFormat">
+                                        <option value="json">JSON</option>
+                                        <option value="plain">Plain Text</option>
+                                        <option value="multiline">Multiline</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" id="testLogstashConnection">
+                                    <i class="fas fa-plug"></i>
+                                    Проверить соединение
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="kibana" class="tab-panel">
+                            <div class="config-form">
+                                <div class="form-group">
+                                    <label>URL Kibana</label>
+                                    <input type="text" class="form-input" placeholder="http://localhost:5601" id="kibanaUrl">
+                                </div>
+                                <div class="form-group">
+                                    <label>Пространство имен</label>
+                                    <input type="text" class="form-input" placeholder="default" id="kibanaSpace">
+                                </div>
+                                <div class="form-group">
+                                    <label>Dashboard ID</label>
+                                    <input type="text" class="form-input" placeholder="logs-dashboard" id="kibanaDashboard">
+                                </div>
+                                <button class="btn btn-primary" id="openKibana">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    Открыть Kibana
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h1>Настройки системы</h1>
+                    <p>Общие настройки мониторинга и уведомлений</p>
+                </div>
+
+                <div class="settings-content">
+                    <div class="settings-category">
+                        <h3>Уведомления</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <label>Email уведомления</label>
+                                <p>Получать уведомления о критических событиях</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="emailNotifications" checked>
+                                <label for="emailNotifications"></label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <label>Звуковые уведомления</label>
+                                <p>Воспроизводить звук при ошибках</p>
+                            </div>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="soundNotifications">
+                                <label for="soundNotifications"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-category">
+                        <h3>Производительность</h3>
+                        <div class="setting-item">
+                            <label>Интервал проверки файлов (мс)</label>
+                            <input type="number" class="form-input" value="1000" id="checkInterval">
+                        </div>
+                        <div class="setting-item">
+                            <label>Максимальное количество файлов</label>
+                            <input type="number" class="form-input" value="1000" id="maxFiles">
+                        </div>
+                    </div>
+
+                    <div class="settings-category">
+                        <h3>Безопасность</h3>
+                        <div class="setting-item">
+                            <label>API ключ</label>
+                            <input type="password" class="form-input" placeholder="Введите API ключ" id="apiKey">
+                        </div>
+                        <div class="setting-item">
+                            <label>Timeout соединения (сек)</label>
+                            <input type="number" class="form-input" value="30" id="connectionTimeout">
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-primary">Сохранить настройки</button>
+                        <button class="btn btn-secondary">Сбросить к умолчанию</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-item">
+            <span class="status-label">Статус:</span>
+            <span class="status-value" id="systemStatus">Готов</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Последнее обновление:</span>
+            <span class="status-value" id="lastUpdate">Никогда</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Версия:</span>
+            <span class="status-value">v1.0.0</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

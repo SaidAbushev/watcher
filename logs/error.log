@@ -1,0 +1,5 @@
+2024-01-15 09:30:15 ERROR [HTTP-404] Page not found: /invalid-path
+2024-01-15 09:45:22 ERROR [DB-001] Connection timeout to database
+2024-01-15 10:15:45 ERROR [AUTH-003] Invalid credentials for user: admin
+2024-01-15 10:20:11 ERROR [MEM-001] Memory usage exceeded 90%
+2024-01-15 10:30:33 ERROR [NET-002] Network timeout while connecting to external API
